@@ -1,0 +1,2 @@
+# Lruk
+Naskah 
