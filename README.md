@@ -1,199 +1,198 @@
--- Universal.lua
--- By.Lruk
-
+-- Code UI: jalankan remote script jika kode valid
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local playerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Create ScreenGui (do not put in CoreGui; use PlayerGui)
+local validCodes = {"99NIGHT","FOREST99","LEOPARD75","EXAMPLECODE"} -- contoh; tambahkan sesuai kebutuhan
+local function isValid(code)
+	if not code then return false end
+	code = tostring(code):upper():gsub("%s+","")
+	for _,v in ipairs(validCodes) do
+		if code == tostring(v):upper():gsub("%s+","") then return true end
+	end
+	return false
+end
+
+local REMOTE_URL = "https://raw.githubusercontent.com/nouralddin-abdullah/ToastyHub-XD/refs/heads/main/hub-main.lua"
+
 local screen = Instance.new("ScreenGui")
-screen.Name = "Universal_By_Lruk"
+screen.Name = "Lruk_CodeUI"
 screen.ResetOnSpawn = false
-screen.Parent = PlayerGui
+screen.Parent = playerGui
 
--- Main frame
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 240, 0, 170)
-frame.Position = UDim2.new(0.38, 0, 0.32, 0)
-frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+local frame = Instance.new("Frame", screen)
+frame.Size = UDim2.new(0,360,0,160)
+frame.Position = UDim2.new(0.5,-180,0.35,-80)
+frame.BackgroundColor3 = Color3.fromRGB(12,12,12)
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
-frame.Parent = screen
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0,10)
 
--- Title
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(0.7, 0, 0, 28)
-title.Position = UDim2.new(0.06, 0, 0, 4)
+local top = Instance.new("Frame", frame)
+top.Size = UDim2.new(1,0,0,36)
+top.BackgroundTransparency = 1
+
+local title = Instance.new("TextLabel", top)
+title.Size = UDim2.new(0.7, -10, 1, 0)
+title.Position = UDim2.new(0,12,0,0)
 title.BackgroundTransparency = 1
-title.Text = "Universal"
-title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Text = "By.Lruk"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(255,255,255)
 title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Minimize button
-local btnMin = Instance.new("TextButton", frame)
-btnMin.Size = UDim2.new(0,28,0,22)
-btnMin.Position = UDim2.new(0.72, 0, 0, 4)
+local sub = Instance.new("TextLabel", frame)
+sub.Size = UDim2.new(1,-24,0,24)
+sub.Position = UDim2.new(0,12,0,40)
+sub.BackgroundTransparency = 1
+sub.Text = "99 night in forest"
+sub.Font = Enum.Font.Gotham
+sub.TextSize = 16
+sub.TextColor3 = Color3.fromRGB(255,255,255)
+sub.TextXAlignment = Enum.TextXAlignment.Left
+
+local btnMin = Instance.new("TextButton", top)
+btnMin.Size = UDim2.new(0,34,0,24)
+btnMin.Position = UDim2.new(0.72,0,0.08,0)
 btnMin.Text = "-"
 btnMin.Font = Enum.Font.GothamBold
 btnMin.TextSize = 18
-btnMin.TextColor3 = Color3.fromRGB(255,255,255)
-btnMin.BackgroundColor3 = Color3.fromRGB(60,60,60)
-Instance.new("UICorner", btnMin).CornerRadius = UDim.new(0,6)
+btnMin.TextColor3 = Color3.fromRGB(230,230,230)
+btnMin.BackgroundColor3 = Color3.fromRGB(70,70,70)
+local minCorner = Instance.new("UICorner", btnMin)
+minCorner.CornerRadius = UDim.new(0,6)
 
--- Close button
-local btnClose = Instance.new("TextButton", frame)
-btnClose.Size = UDim2.new(0,28,0,22)
-btnClose.Position = UDim2.new(0.85, 0, 0, 4)
+local btnClose = Instance.new("TextButton", top)
+btnClose.Size = UDim2.new(0,34,0,24)
+btnClose.Position = UDim2.new(0.86,0,0.08,0)
 btnClose.Text = "X"
 btnClose.Font = Enum.Font.GothamBold
 btnClose.TextSize = 16
 btnClose.TextColor3 = Color3.fromRGB(255,255,255)
-btnClose.BackgroundColor3 = Color3.fromRGB(60,60,60)
-Instance.new("UICorner", btnClose).CornerRadius = UDim.new(0,6)
+btnClose.BackgroundColor3 = Color3.fromRGB(70,70,70)
+local closeCorner = Instance.new("UICorner", btnClose)
+closeCorner.CornerRadius = UDim.new(0,6)
 
--- By.Lruk label
-local byLabel = Instance.new("TextLabel", frame)
-byLabel.Size = UDim2.new(0.6,0,0,18)
-byLabel.Position = UDim2.new(0.06,0,0.88,0)
-byLabel.Text = "By. Lruk"
-byLabel.BackgroundTransparency = 1
-byLabel.TextColor3 = Color3.fromRGB(255,255,255)
-byLabel.Font = Enum.Font.Gotham
-byLabel.TextSize = 12
-byLabel.TextXAlignment = Enum.TextXAlignment.Left
+local content = Instance.new("Frame", frame)
+content.Size = UDim2.new(1,-24,1,-64)
+content.Position = UDim2.new(0,12,0,56)
+content.BackgroundTransparency = 1
 
--- Buttons
-local function makeButton(text, ypos)
-	local b = Instance.new("TextButton", frame)
-	b.Size = UDim2.new(0.88,0,0,34)
-	b.Position = UDim2.new(0.06,0,ypos,0)
-	b.Text = text
-	b.Font = Enum.Font.Gotham
-	b.TextSize = 15
-	b.TextColor3 = Color3.fromRGB(255,255,255)
-	b.BackgroundColor3 = Color3.fromRGB(80,80,80)
-	Instance.new("UICorner", b).CornerRadius = UDim.new(0,8)
-	return b
-end
+local input = Instance.new("TextBox", content)
+input.Size = UDim2.new(1,0,0,36)
+input.Position = UDim2.new(0,0,0,0)
+input.PlaceholderText = "Input kode"
+input.Text = ""
+input.Font = Enum.Font.Gotham
+input.TextSize = 18
+input.TextColor3 = Color3.fromRGB(255,255,255)
+input.BackgroundColor3 = Color3.fromRGB(60,60,60)
+input.ClearTextOnFocus = false
+input.BorderSizePixel = 0
+local inputCorner = Instance.new("UICorner", input)
+inputCorner.CornerRadius = UDim.new(0,8)
 
-local btnTracker = makeButton("👁️ Tracker", 0.30)
-local btnSee = makeButton("👀 Tembus Pandang", 0.57)
+local accept = Instance.new("TextButton", content)
+accept.Size = UDim2.new(1,0,0,36)
+accept.Position = UDim2.new(0,0,0,44)
+accept.Text = "Accept"
+accept.Font = Enum.Font.GothamBold
+accept.TextSize = 18
+accept.TextColor3 = Color3.fromRGB(255,255,255)
+accept.BackgroundColor3 = Color3.fromRGB(95,95,95)
+accept.BorderSizePixel = 0
+local acceptCorner = Instance.new("UICorner", accept)
+acceptCorner.CornerRadius = UDim.new(0,8)
 
--- Minimize / Close actions
-local hidden = false
+local status = Instance.new("TextLabel", content)
+status.Size = UDim2.new(1,0,0,20)
+status.Position = UDim2.new(0,0,0,88)
+status.BackgroundTransparency = 1
+status.Text = ""
+status.Font = Enum.Font.Gotham
+status.TextSize = 14
+status.TextColor3 = Color3.fromRGB(200,200,200)
+status.TextXAlignment = Enum.TextXAlignment.Left
+
+local minimized = false
 btnMin.MouseButton1Click:Connect(function()
-	hidden = not hidden
-	for _,v in pairs(frame:GetChildren()) do
-		if v ~= title and v ~= btnMin and v ~= btnClose then
-			v.Visible = not hidden
-		end
+	minimized = not minimized
+	if minimized then
+		for _,v in pairs(content:GetChildren()) do v.Visible = false end
+		frame.Size = UDim2.new(0,360,0,40)
+		btnMin.Text = "+"
+	else
+		for _,v in pairs(content:GetChildren()) do v.Visible = true end
+		frame.Size = UDim2.new(0,360,0,160)
+		btnMin.Text = "-"
 	end
-	frame.Size = hidden and UDim2.new(0,240,0,34) or UDim2.new(0,240,0,170)
 end)
+btnClose.MouseButton1Click:Connect(function() screen:Destroy() end)
 
-btnClose.MouseButton1Click:Connect(function()
-	screen:Destroy()
-end)
-
--- CORE FEATURES: tracker (white highlight) & see-through (local)
-local RunService = game:GetService("RunService")
-local highlightInst = nil
-local trackerActive = false
-local seeActive = false
-local lastTarget = nil
-
-local function makeWhiteHighlight(targetCharacter)
-	if highlightInst then
-		highlightInst:Destroy()
-		highlightInst = nil
-	end
-	if not targetCharacter then return end
-	local h = Instance.new("Highlight")
-	h.FillColor = Color3.fromRGB(255,255,255)
-	h.OutlineColor = Color3.fromRGB(255,255,255)
-	h.FillTransparency = 0.2
-	h.OutlineTransparency = 0
-	h.Parent = targetCharacter
-	highlightInst = h
-end
-
-local function clearHighlight()
-	if highlightInst then
-		pcall(function() highlightInst:Destroy() end)
-		highlightInst = nil
+local function setAcceptState(success, message)
+	if success then
+		TweenService:Create(accept, TweenInfo.new(0.18), {BackgroundColor3 = Color3.fromRGB(75,200,75)}):Play()
+		status.TextColor3 = Color3.fromRGB(120,240,120)
+		status.Text = message or "Kode benar"
+	else
+		TweenService:Create(accept, TweenInfo.new(0.18), {BackgroundColor3 = Color3.fromRGB(220,70,70)}):Play()
+		status.TextColor3 = Color3.fromRGB(255,160,160)
+		status.Text = message or "Kode salah"
 	end
 end
 
--- find nearest other player within radius (local player's HRP required)
-local TRACK_RADIUS = 120
-local function findNearest()
-	local lpChar = LocalPlayer.Character
-	if not lpChar or not lpChar:FindFirstChild("HumanoidRootPart") then return nil end
-	local best, bd = nil, math.huge
-	for _,pl in pairs(Players:GetPlayers()) do
-		if pl ~= LocalPlayer and pl.Character and pl.Character:FindFirstChild("HumanoidRootPart") then
-			local d = (pl.Character.HumanoidRootPart.Position - lpChar.HumanoidRootPart.Position).Magnitude
-			if d < bd and d <= TRACK_RADIUS then
-				bd = d
-				best = pl
-			end
-		end
-	end
-	return best
+local function resetAcceptAfter(delayTime)
+	task.spawn(function()
+		task.wait(delayTime)
+		TweenService:Create(accept, TweenInfo.new(0.18), {BackgroundColor3 = Color3.fromRGB(95,95,95)}):Play()
+		status.Text = ""
+	end)
 end
 
--- Tracker loop (runs while trackerActive)
-task.spawn(function()
-	while true do
-		task.wait(0.6)
-		if trackerActive then
-			local nearest = findNearest()
-			if nearest and nearest.Character then
-				if lastTarget ~= nearest.Character then
-					clearHighlight()
-					makeWhiteHighlight(nearest.Character)
-					lastTarget = nearest.Character
-				end
+local function tryLoadRemote(url)
+	-- safe call: pcall to avoid crashing if HttpGet is disallowed or remote errors
+	local ok,ret = pcall(function()
+		local s = game:HttpGet(url)
+		local f = loadstring(s)
+		return f and f()
+	end)
+	return ok, ret
+end
+
+accept.MouseButton1Click:Connect(function()
+	local code = tostring(input.Text or ""):gsub("^%s*(.-)%s*$","%1")
+	if code == "" then
+		setAcceptState(false, "Masukkan kode terlebih dahulu")
+		resetAcceptAfter(2)
+		return
+	end
+	if isValid(code) then
+		setAcceptState(true, "Kode diterima — memuat script...")
+		-- jalankan remote script dengan pcall dan beri umpan balik
+		task.spawn(function()
+			local ok,ret = tryLoadRemote(REMOTE_URL)
+			if ok then
+				status.Text = "Script berhasil dimuat"
+				status.TextColor3 = Color3.fromRGB(120,240,120)
 			else
-				if lastTarget then
-					clearHighlight()
-					lastTarget = nil
-				end
+				status.Text = "Gagal memuat script"
+				status.TextColor3 = Color3.fromRGB(255,160,160)
 			end
-		else
-			if lastTarget then clearHighlight() lastTarget = nil end
-		end
+			resetAcceptAfter(3)
+		end)
+	else
+		setAcceptState(false, "Kode tidak valid")
+		resetAcceptAfter(2)
 	end
 end)
 
--- Toggle tracker
-btnTracker.MouseButton1Click:Connect(function()
-	trackerActive = not trackerActive
-	btnTracker.Text = trackerActive and "✅ Tracker Aktif" or "👁️ Tracker"
-	btnTracker.BackgroundColor3 = trackerActive and Color3.fromRGB(100,100,255) or Color3.fromRGB(80,80,80)
-end)
-
--- Toggle see-through (local only)
-btnSee.MouseButton1Click:Connect(function()
-	seeActive = not seeActive
-	for _,pl in pairs(Players:GetPlayers()) do
-		if pl.Character then
-			for _,part in pairs(pl.Character:GetDescendants()) do
-				if part:IsA("BasePart") then
-					-- Local transparency modifier so only you see the effect
-					part.LocalTransparencyModifier = seeActive and 0.5 or 0
-				end
-			end
-		end
+input.FocusLost:Connect(function(enterPressed)
+	if enterPressed then
+		accept:CaptureFocus()
+		accept:MouseButton1Click()
 	end
-	btnSee.Text = seeActive and "✅ Tembus Aktif" or "👀 Tembus Pandang"
-	btnSee.BackgroundColor3 = seeActive and Color3.fromRGB(100,100,255) or Color3.fromRGB(80,80,80)
 end)
-
--- Safety: clear highlight when player respawns/exits
-Players.PlayerRemoving:Connect(function(pl) if pl.Character == lastTarget then clearHighlight() lastTarget = nil end end)
-Players.PlayerAdded:Connect(function(pl) pl.CharacterAdded:Connect(function() if lastTarget and lastTarget.Parent==nil then clearHighlight() lastTarget=nil end end) end)
